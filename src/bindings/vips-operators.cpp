@@ -3525,6 +3525,30 @@ Image Image::spcor(emscripten::val ref) const
     return out;
 }
 
+Image Image::fwfft() const
+{
+    Image out;
+
+    this->call("fwfft",
+               (new Option)
+                   ->set("in", *this)
+                   ->set("out", &out));
+
+    return out;
+}
+
+Image Image::invfft() const
+{
+    Image out;
+
+    this->call("invfft",
+               (new Option)
+                   ->set("in", *this)
+                   ->set("out", &out));
+
+    return out;
+}
+
 Image Image::spectrum() const
 {
     Image out;

@@ -1560,6 +1560,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
                   }))
         .function("float2rad", &Image::float2rad)
         .function("freqmult", &Image::freqmult)
+        .function("fwfft", &Image::fwfft)
         .function("gamma", &Image::gamma)
         .function("gamma", optional_override([](const Image &image) {
                       return image.gamma();
@@ -1664,6 +1665,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
         .function("invertlut", optional_override([](const Image &image) {
                       return image.invertlut();
                   }))
+        .function("invfft", &Image::invfft)
         .function("join", &Image::join)
         .function("join", optional_override([](const Image &image, emscripten::val in2, emscripten::val direction) {
                       return image.join(in2, direction);

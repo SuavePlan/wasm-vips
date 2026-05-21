@@ -2061,6 +2061,18 @@ Image sobel() const;
 Image spcor(emscripten::val ref) const;
 
 /**
+ * Forward fast Fourier transform.
+ * @return Output image (complex).
+ */
+Image fwfft() const;
+
+/**
+ * Inverse fast Fourier transform.
+ * @return Output image.
+ */
+Image invfft() const;
+
+/**
  * Make displayable power spectrum.
  * @return Output image.
  */
