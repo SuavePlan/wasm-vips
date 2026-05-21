@@ -194,6 +194,7 @@ VERSION_TIFF=561e901        # https://gitlab.com/libtiff/libtiff
 VERSION_RESVG=0.47.0        # https://github.com/linebender/resvg
 VERSION_AOM=3.13.3          # https://aomedia.googlesource.com/aom
 VERSION_HEIF=78638f4        # https://github.com/strukturag/libheif
+VERSION_FFTW=3.3.10         # https://fftw.org
 VERSION_VIPS=8.18.2         # https://github.com/libvips/libvips
 
 VERSION_EMSCRIPTEN="$(emcc -dumpversion)"
@@ -206,6 +207,7 @@ VERSION_EMSCRIPTEN="$(emcc -dumpversion)"
   printf "  \"emscripten\": \"${VERSION_EMSCRIPTEN}\",\n"; \
   printf "  \"exif\": \"${VERSION_EXIF}\",\n"; \
   printf "  \"expat\": \"${VERSION_EXPAT}\",\n"; \
+  printf "  \"fftw\": \"${VERSION_FFTW}\",\n"; \
   printf "  \"ffi\": \"${VERSION_FFI}\",\n"; \
   printf "  \"glib\": \"${VERSION_GLIB}\",\n"; \
   [ -n "$DISABLE_AVIF" ] || printf "  \"heif\": \"${VERSION_HEIF}\",\n"; \
@@ -515,6 +517,18 @@ node --version
   fi
 )
 
+[ -f "$TARGET/lib/pkgconfig/fftw3.pc" ] || (
+  stage "Compiling fftw3"
+  mkdir $DEPS/fftw
+  curl -Ls https://fftw.org/fftw-$VERSION_FFTW.tar.gz | tar xzC $DEPS/fftw --strip-components=1
+  cd $DEPS/fftw
+  emconfigure ./configure --host=$CHOST --prefix=$TARGET --enable-static --disable-shared \
+    --disable-dependency-tracking --disable-fortran --disable-doc \
+    --disable-threads --disable-openmp --without-g77 --without-gcc-warnings \
+    CFLAGS="$CFLAGS -O3"
+  emmake make install
+)
+
 [ -f "$TARGET/lib/pkgconfig/vips.pc" ] || (
   stage "Compiling vips"
   mkdir $DEPS/vips
@@ -527,7 +541,7 @@ node --version
   meson setup _build --prefix=$TARGET $MESON_ARGS --default-library=static --buildtype=release \
     -Ddeprecated=false -Dexamples=false -Dcplusplus=$LIBVIPS_CPP -Dauto_features=enabled \
     -Dintrospection=disabled ${DISABLE_MODULES:+-Dmodules=disabled} -Darchive=disabled \
-    -Dcfitsio=disabled -Dfftw=disabled -Dfontconfig=disabled ${DISABLE_AVIF:+-Dheif=disabled} \
+    -Dcfitsio=disabled -Dfftw=enabled -Dfontconfig=disabled ${DISABLE_AVIF:+-Dheif=disabled} \
     ${DISABLE_SIMD:+-Dhighway=disabled} ${DISABLE_JXL:+-Djpeg-xl=disabled} -Dmagick=disabled \
     -Dmatio=disabled -Dnifti=disabled -Dopenexr=disabled -Dopenjpeg=disabled \
     -Dopenslide=disabled -Dpangocairo=disabled -Dpdfium=disabled -Dpoppler=disabled \
